@@ -1,0 +1,12 @@
+awsRegion: us-east-1
+
+rbac:
+  create: true
+  serviceAccount:
+    name: cluster-autoscaler-aws-cluster-autoscaler-chart
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::744000309083:role/cluster-autoscaler"
+
+autoDiscovery:
+  clusterName: kube-playground
+  enabled: true

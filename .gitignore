@@ -1,0 +1,17 @@
+# golang output binary directory
+archive
+bin
+
+*.DS_Store
+**/.vscode/*
+
+# terraform
+**/.terraform/*
+*.auto.tfvars
+*.tfstate
+*.tfstate.*
+*_override.tf
+*_override.tf.json
+crash.log
+override.tf
+override.tf.json
