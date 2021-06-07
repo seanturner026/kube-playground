@@ -16,6 +16,23 @@ helm repo update
 helm install cluster-autoscaler --namespace kube-system autoscaler/cluster-autoscaler --values ./helm/cluster_autoscaler_chart_values.yaml
 ```
 
+#### metrics server
+```
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl get deployment metrics-server -n kube-system
+```
+
+#### prometheus
+```
+kubectl create namespace prometheus
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm upgrade -i prometheus prometheus-community/prometheus \
+    --namespace prometheus \
+    --set alertmanager.persistentVolume.storageClass="gp2",server.persistentVolume.storageClass="gp2"
+kubectl get pods -n prometheus
+kubectl --namespace=prometheus port-forward deploy/prometheus-server 9090
+```
+
 #### aws load balancer controller
 ```
 helm repo add eks https://aws.github.io/eks-charts
@@ -25,6 +42,6 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n ku
 
 #### go http server deployment
 ```
-k apply -f ./kube/namespace.yaml
-k apply -f ./kube/
+kubectl create namespace prometheus
+kubectl apply -f ./kube/
 ```
