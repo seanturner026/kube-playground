@@ -42,6 +42,6 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n ku
 
 #### go http server deployment
 ```
-kubectl create namespace prometheus
+kubectl create namespace go-http
 kubectl apply -f ./kube/
 ```
