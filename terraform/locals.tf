@@ -49,21 +49,21 @@ locals {
     "kubernetes.io/cluster/${var.stack_name}" = "shared"
   }
 
-  node_groups = {
-    this = {
-      desired_capacity = 1
-      max_capacity     = 1
-      min_capacity     = 1
-      instance_type    = "t3a.small"
-      capacity_type    = "SPOT",
-      k8s_labels       = local.module_tags.eks
+  # node_groups = {
+  #   this = {
+  #     desired_capacity = 1
+  #     max_capacity     = 1
+  #     min_capacity     = 1
+  #     instance_type    = "t3a.small"
+  #     capacity_type    = "SPOT",
+  #     k8s_labels       = local.module_tags.eks
 
-      additional_tags = {
-        "k8s.io/cluster-autoscaler/enabled"           = "true"
-        "k8s.io/cluster-autoscaler/${var.stack_name}" = "owned"
-      }
-    }
-  }
+  #     additional_tags = {
+  #       "k8s.io/cluster-autoscaler/enabled"           = "true"
+  #       "k8s.io/cluster-autoscaler/${var.stack_name}" = "owned"
+  #     }
+  #   }
+  # }
 
   node_groups_defaults = {
     ami_type  = "AL2_x86_64"
@@ -71,8 +71,8 @@ locals {
   }
 
   map_users = [{
-    userarn  = "arn:aws:iam::${data.aws_caller_identity.current.id}:user/sean.turner"
-    username = "sean.turner"
+    userarn  = "arn:aws:iam::${data.aws_caller_identity.current.id}:user/${var.aws_iam_username}"
+    username = var.aws_iam_username
     groups   = ["system:masters"]
   }]
 
