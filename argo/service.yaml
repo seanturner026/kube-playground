@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: go-http
+  name: service-go-http-root
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: go-http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: go-http
+  name: service-go-http-stable
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: go-http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: go-http
+  name: service-go-http-canary
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: go-http

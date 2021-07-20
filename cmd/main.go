@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -25,6 +26,7 @@ func defaultHandler(w http.ResponseWriter, req *http.Request) {
 	for key, value := range map[string]string{
 		"{{HOST}}":   req.Host,
 		"{{METHOD}}": req.Method,
+		"{{COLOR}}":  os.Getenv("COLOR"),
 	} {
 		templatedHTML = strings.ReplaceAll(templatedHTML, key, value)
 	}

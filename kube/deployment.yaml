@@ -14,8 +14,16 @@ spec:
         app.kubernetes.io/name: go-http
     spec:
       containers:
-      - image: seanturner026/kube-playground-http-server
-        imagePullPolicy: Always
-        name: go-http
-        ports:
-        - containerPort: 3000
+        - image: seanturner026/kube-playground-http-server
+          imagePullPolicy: Always
+          name: go-http
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 5m
+          env:
+            - name: COLOR
+              value: blue
+          ports:
+            - name: http
+              containerPort: 3000
