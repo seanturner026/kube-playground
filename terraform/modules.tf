@@ -32,7 +32,7 @@ module "eks" {
   version = "v17.0.3"
 
   cluster_name                   = var.stack_name
-  cluster_version                = "1.20"
+  cluster_version                = "1.20" // "1.21"
   subnets                        = module.vpc.public_subnets
   attach_worker_cni_policy       = true
   cluster_create_security_group  = true
