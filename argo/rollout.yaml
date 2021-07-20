@@ -24,11 +24,11 @@ spec:
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: deployment-go-http
+      app.kubernetes.io/name: go-http
   template:
     metadata:
       labels:
-        app: deployment-go-http
+        app.kubernetes.io/name: go-http
     spec:
       containers:
         - name: go-http
