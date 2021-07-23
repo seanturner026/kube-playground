@@ -39,7 +39,7 @@ spec:
               cpu: 5m
           env:
             - name: COLOR
-              value: green
+              value: blue
           ports:
             - name: http
               containerPort: 3000
