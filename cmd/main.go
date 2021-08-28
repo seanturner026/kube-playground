@@ -5,17 +5,47 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 )
+
+func init() {
+	log.SetFormatter(&log.JSONFormatter{})
+	prometheus.Register(totalRequests)
+	prometheus.Register(responseStatus)
+	prometheus.Register(httpDuration)
+}
+
+type responseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func NewResponseWriter(w http.ResponseWriter) *responseWriter {
+	return &responseWriter{w, http.StatusOK}
+}
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Info(fmt.Sprintf("handling %v request on %v", r.Method, r.RequestURI))
+		route := mux.CurrentRoute(r)
+		path, _ := route.GetPathTemplate()
+
+		timer := prometheus.NewTimer(httpDuration.WithLabelValues(path))
+		rw := NewResponseWriter(w)
 		next.ServeHTTP(w, r)
+
+		statusCode := rw.statusCode
+		responseStatus.WithLabelValues(strconv.Itoa(statusCode)).Inc()
+		totalRequests.WithLabelValues("path").Inc()
+		timer.ObserveDuration()
 	})
 }
 
@@ -23,8 +53,13 @@ func loggingMiddleware(next http.Handler) http.Handler {
 var templatedHTML string
 
 func defaultHandler(w http.ResponseWriter, req *http.Request) {
+	u, err := url.Parse(req.Host)
+	if err != nil {
+		log.Info(err)
+	}
+
 	for key, value := range map[string]string{
-		"{{HOST}}":   req.Host,
+		"{{HOST}}":   u.Hostname(),
 		"{{METHOD}}": req.Method,
 		"{{COLOR}}":  os.Getenv("COLOR"),
 	} {
@@ -47,7 +82,6 @@ func headersHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	log.SetFormatter(&log.JSONFormatter{})
 	log.Info("initializing server...")
 
 	r := mux.NewRouter()
@@ -55,6 +89,7 @@ func main() {
 
 	r.HandleFunc("/", defaultHandler).Methods("GET")
 	r.HandleFunc("/headers", headersHandler).Methods("GET")
+	r.Path("/metrics").Handler(promhttp.Handler())
 
-	log.Fatal(http.ListenAndServe(":3000", r))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }

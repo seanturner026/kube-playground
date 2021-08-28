@@ -42,4 +42,4 @@ spec:
               value: green
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: 8080

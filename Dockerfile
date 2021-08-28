@@ -14,6 +14,4 @@ FROM scratch
 
 COPY --from=build /src/server .
 
-EXPOSE 3000
-
 ENTRYPOINT ["/server"]

@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   namespace: go-http
   name: deployment-go-http
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
 spec:
   selector:
     matchLabels:
@@ -26,4 +30,4 @@ spec:
               value: blue
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: 8080

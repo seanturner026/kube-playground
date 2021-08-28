@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: go-http
@@ -11,7 +11,10 @@ spec:
   rules:
     - http:
         paths:
-          - path: /*
+          - pathType: Prefix
+            path: /
             backend:
-              serviceName: service-go-http
-              servicePort: 80
+              service:
+                name: service-go-http
+                port:
+                  number: 80
