@@ -8,7 +8,7 @@ locals {
     }
     eks = {
       ModuleRepo    = "terraform-aws-eks"
-      ModuleVersion = "v17.0.3"
+      ModuleVersion = "v17.1.0"
       ModuleOrg     = "terraform-aws-modules"
     }
   }

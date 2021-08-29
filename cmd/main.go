@@ -23,33 +23,26 @@ func init() {
 	prometheus.Register(httpDuration)
 }
 
-type responseWriter struct {
-	http.ResponseWriter
-	statusCode int
-}
-
-func NewResponseWriter(w http.ResponseWriter) *responseWriter {
-	return &responseWriter{w, http.StatusOK}
-}
-
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Info(fmt.Sprintf("handling %v request on %v", r.Method, r.RequestURI))
+		log.Info(fmt.Sprintf("handling %s request on %s", r.Method, r.RequestURI))
 		route := mux.CurrentRoute(r)
-		path, _ := route.GetPathTemplate()
+		path, err := route.GetPathTemplate()
+		if err != nil {
+			log.Info(err)
+		}
 
 		timer := prometheus.NewTimer(httpDuration.WithLabelValues(path))
-		rw := NewResponseWriter(w)
 		next.ServeHTTP(w, r)
 
-		statusCode := rw.statusCode
+		statusCode := http.StatusOK
 		responseStatus.WithLabelValues(strconv.Itoa(statusCode)).Inc()
 		totalRequests.WithLabelValues("path").Inc()
 		timer.ObserveDuration()
 	})
 }
 
-//go:embed home.html
+//go:embed index.html
 var templatedHTML string
 
 func defaultHandler(w http.ResponseWriter, req *http.Request) {
