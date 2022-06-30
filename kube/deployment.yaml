@@ -3,10 +3,10 @@ kind: Deployment
 metadata:
   namespace: go-http
   name: deployment-go-http
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/path: /metrics
-    prometheus.io/port: "8080"
+  # annotations:
+  #   prometheus.io/scrape: "true"
+  #   prometheus.io/path: /metrics
+  #   prometheus.io/port: "8080"
 spec:
   selector:
     matchLabels:
@@ -25,6 +25,9 @@ spec:
             requests:
               memory: 32Mi
               cpu: 5m
+          securityContext:
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
           env:
             - name: COLOR
               value: blue
