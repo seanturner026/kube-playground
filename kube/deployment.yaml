@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,7 +19,7 @@ spec:
         app.kubernetes.io/name: go-http
     spec:
       containers:
-        - image: seanturner026/kube-playground-http-server
+        - image: seanturner026/kube-playground-http-server:arm
           imagePullPolicy: Always
           name: go-http
           resources:

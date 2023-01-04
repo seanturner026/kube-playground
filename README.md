@@ -50,8 +50,8 @@ kubectl --namespace grafana port-forward $GRAFANA_POD_NAME 3000
 helm repo add eks https://aws.github.io/eks-charts
 kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
-    --namespace kube-system \
-    --set clusterName=kube-playground \
+    -n kube-system \
+    --set clusterName=my-kube-playground \
     --set serviceAccount.create=false \
     --set serviceAccount.name=aws-load-balancer-controller
 ```

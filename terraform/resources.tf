@@ -1,12 +1,12 @@
 resource "aws_iam_policy" "cluster_autoscaler" {
   name_prefix = "cluster-autoscaler"
-  description = "EKS cluster-autoscaler policy for cluster ${module.eks.cluster_id}"
+  description = "EKS cluster-autoscaler policy for cluster ${module.eks.cluster_name}"
   policy      = data.aws_iam_policy_document.cluster_autoscaler.json
 }
 
 resource "aws_iam_policy" "alb_controller" {
   name        = "AWSLoadBalancerControllerIAMPolicy"
-  description = "EKS ALB controller policy for cluster ${module.eks.cluster_id}"
+  description = "EKS ALB controller policy for cluster ${module.eks.cluster_name}"
   policy      = data.aws_iam_policy_document.alb_controller.json
 }
 
@@ -28,4 +28,3 @@ resource "kubernetes_service_account" "this" {
     }
   }
 }
-

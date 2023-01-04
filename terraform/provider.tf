@@ -5,7 +5,6 @@ provider "aws" {
     tags = {
       GithubRepo = "github.com/seanturner026/kube-playground"
       ManagedBy  = "terraform"
-      Name       = "kube-playground"
     }
   }
 }

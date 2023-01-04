@@ -7,7 +7,7 @@ module "subnet_addresses" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "v3.0.0"
+  version = "v3.18.1"
 
   name                   = var.stack_name
   cidr                   = module.subnet_addresses.base_cidr_block
@@ -29,42 +29,59 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "v17.1.0"
+  version = "19.4.2"
 
   cluster_name                   = var.stack_name
-  cluster_version                = "1.21"
-  subnets                        = module.vpc.public_subnets
-  attach_worker_cni_policy       = true
-  cluster_create_security_group  = true
-  cluster_endpoint_public_access = true
-  manage_aws_auth                = true
-  manage_cluster_iam_resources   = true
-  manage_worker_iam_resources    = true
+  cluster_version                = "1.24"
+  subnet_ids                     = module.vpc.public_subnets
   vpc_id                         = module.vpc.vpc_id
-  # node_groups                    = local.node_groups
-  # node_groups_defaults           = local.node_groups_defaults
-  map_users        = local.map_users
-  write_kubeconfig = false
-  enable_irsa      = true
-  worker_groups = [
-    {
-      name                 = "worker-group-1"
-      instance_type        = "t3.medium"
-      asg_desired_capacity = 1
-      tags = [
-        {
-          "key"                 = "k8s.io/cluster-autoscaler/enabled"
-          "propagate_at_launch" = "false"
-          "value"               = "true"
-        },
-        {
-          "key"                 = "k8s.io/cluster-autoscaler/${var.stack_name}"
-          "propagate_at_launch" = "false"
-          "value"               = "owned"
-        }
-      ]
+  cluster_endpoint_public_access = true
+  manage_aws_auth_configmap      = true
+  enable_irsa                    = true
+  create_kms_key                 = true
+
+  eks_managed_node_groups = {
+    # x86_spot = {
+    #   ami_type       = "AL2_x86_64"
+    #   min_size       = 1
+    #   max_size       = 1
+    #   desired_size   = 1
+    #   instance_types = ["t3a.small"]
+    #   capacity_type  = "SPOT"
+    #   update_config  = { max_unavailable_percentage = 33 }
+
+    #   tags = {
+    #     "k8s.io/cluster-autoscaler/${var.stack_name}" = "owned"
+    #     "k8s.io/cluster-autoscaler/enabled"           = "true"
+    #   }
+    # }
+    arm_spot = {
+      ami_type       = "AL2_ARM_64"
+      min_size       = 1
+      max_size       = 1
+      desired_size   = 1
+      instance_types = ["t4g.small"]
+      capacity_type  = "SPOT"
+      update_config  = { max_unavailable_percentage = 33 }
+
+      tags = {
+        "k8s.io/cluster-autoscaler/${var.stack_name}" = "owned"
+        "k8s.io/cluster-autoscaler/enabled"           = "true"
+      }
     }
-  ]
+  }
+
+  cluster_addons = {
+    coredns    = { most_recent = true }
+    kube-proxy = { most_recent = true }
+    vpc-cni    = { most_recent = true }
+  }
+
+  aws_auth_users = [{
+    userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.aws_iam_username}"
+    username = var.aws_iam_username
+    groups   = ["system:masters"]
+  }]
 }
 
 module "iam_assumable_role_admin" {

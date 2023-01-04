@@ -46,13 +46,12 @@ func loggingMiddleware(next http.Handler) http.Handler {
 var templatedHTML string
 
 func defaultHandler(w http.ResponseWriter, req *http.Request) {
-	u, err := url.Parse(req.Host)
+	_, err := url.Parse(req.Host)
 	if err != nil {
 		log.Info(err)
 	}
 
 	for key, value := range map[string]string{
-		"{{HOST}}":   u.Hostname(),
 		"{{METHOD}}": req.Method,
 		"{{COLOR}}":  os.Getenv("COLOR"),
 	} {
