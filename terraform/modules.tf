@@ -29,7 +29,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.4.2"
+  version = "~> 19.4"
 
   cluster_name                   = var.stack_name
   cluster_version                = "1.24"
@@ -74,7 +74,21 @@ module "eks" {
   cluster_addons = {
     coredns    = { most_recent = true }
     kube-proxy = { most_recent = true }
-    vpc-cni    = { most_recent = true }
+    vpc-cni = {
+      most_recent = true
+      configuration_values = jsonencode(
+        {
+          env = {
+            ENABLE_POD_ENI = "true"
+          },
+          init = {
+            env = {
+              DISABLE_TCP_EARLY_DEMUX = "true"
+            }
+          }
+        }
+      )
+    }
   }
 
   aws_auth_users = [{
