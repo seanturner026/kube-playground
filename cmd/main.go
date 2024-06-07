@@ -62,6 +62,10 @@ func defaultHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "%v", templatedHTML)
 }
 
+func healthCheckHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "%v", "healthy")
+}
+
 func headersHandler(w http.ResponseWriter, req *http.Request) {
 	requestHeaders := make(map[string]string)
 	for name, headers := range req.Header {
@@ -80,6 +84,7 @@ func main() {
 	r.Use(loggingMiddleware)
 
 	r.HandleFunc("/", defaultHandler).Methods("GET")
+	r.HandleFunc("/healthcheck", healthCheckHandler).Methods("GET")
 	r.HandleFunc("/headers", headersHandler).Methods("GET")
 	r.Path("/metrics").Handler(promhttp.Handler())
 

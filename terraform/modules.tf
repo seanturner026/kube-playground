@@ -32,13 +32,13 @@ module "eks" {
   version = "~> 19.4"
 
   cluster_name                   = var.stack_name
-  cluster_version                = "1.24"
+  cluster_version                = "1.25"
   subnet_ids                     = module.vpc.public_subnets
   vpc_id                         = module.vpc.vpc_id
   cluster_endpoint_public_access = true
   manage_aws_auth_configmap      = true
   enable_irsa                    = true
-  create_kms_key                 = true
+  create_kms_key                 = false
 
   eks_managed_node_groups = {
     # x86_spot = {
@@ -76,18 +76,16 @@ module "eks" {
     kube-proxy = { most_recent = true }
     vpc-cni = {
       most_recent = true
-      configuration_values = jsonencode(
-        {
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_POD_ENI = "true"
+        }
+        init = {
           env = {
-            ENABLE_POD_ENI = "true"
-          },
-          init = {
-            env = {
-              DISABLE_TCP_EARLY_DEMUX = "true"
-            }
+            DISABLE_TCP_EARLY_DEMUX = "true"
           }
         }
-      )
+      })
     }
   }
 
