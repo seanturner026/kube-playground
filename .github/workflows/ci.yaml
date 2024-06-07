@@ -27,4 +27,4 @@ jobs:
           push: true
           tags: |-
             ${{ secrets.DOCKERHUB_USERNAME }}/kube-playground-http-server:latest,
-            ${{ secrets.DOCKERHUB_USERNAME }}/kube-playground-http-server:$GITHUB_SHA
+            ${{ secrets.DOCKERHUB_USERNAME }}/kube-playground-http-server:${{ github.sha }}
