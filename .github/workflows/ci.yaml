@@ -21,6 +21,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          push: true
-          tags: seanturner026/kube-playground-http-server:latest,seanturner026/kube-playground-http-server:GITHUB_SHA
           context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64/v8
+          push: true
+          tags: |-
+            ${{ secrets.DOCKERHUB_USERNAME }}/kube-playground-http-server:latest,
+            ${{ secrets.DOCKERHUB_USERNAME }}/kube-playground-http-server:$GITHUB_SHA
